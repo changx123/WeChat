@@ -40,14 +40,3 @@ func (w *Wechat) Init() {
 	w.httpx = getNewHttpx()
 	w.httpx.Get("https://wx2.qq.com/?&lang=zh_CN")
 }
-
-//获取web微信uuid
-func (w *Wechat) GetUUid() (string , error) {
-	sTime := function.GetNewTime()
-	sTime = function.RegexpString(sTime,0,13)
-	resp , err := w.httpx.Get("https://login.wx.qq.com/jslogin?appid=wx782c26e4c19acffb&redirect_uri=https://wx.qq.com/cgi-bin/mmwebwx-bin/webwxnewloginpage&fun=new&lang=zh_CN&_="+sTime)
-	if err != nil {
-		return "" , err
-	}
-	return string(resp.Body) , nil
-}
