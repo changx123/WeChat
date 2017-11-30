@@ -7,14 +7,18 @@ import (
 )
 
 func main() {
-	var wechat = &wechat.Wechat{}
-	wechat.Init()
-	uuid , err := wechat.GetUUid()
+	//获取微信指针
+	var we = &wechat.Wechat{}
+	//初始化httpx cookie等信息
+	we.Init()
+	//获取微信uuid
+	uuid, err := we.GetUUid()
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	img , err := wechat.GetQrcide(uuid)
+	//获取登录二维码
+	img, err := we.GetQrcide(uuid)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -24,5 +28,42 @@ func main() {
 		fmt.Println(err)
 		return
 	}
+	defer file.Close()
 	file.Write(img)
+	//监听扫描二维码
+	for {
+		head_img, err := we.ListenQrcode(uuid)
+		if err != nil {
+			if err == wechat.ErrCodeEq408 {
+				fmt.Println("扫码超时重新监听")
+				continue
+			}
+			if err == wechat.ErrCodeEq400 {
+				fmt.Println("uuid失效请重新获取")
+				return
+			}
+			fmt.Println(err)
+			return
+		}
+		fmt.Println("base64微信头像:" + string(head_img))
+		break
+	}
+	//监听确认登录
+	for {
+		redirect_uri, err := we.ConfirmQrcode(uuid)
+		if err != nil {
+			if err == wechat.ErrCodeEq408 {
+				fmt.Println("扫码超时重新监听")
+				continue
+			}
+			if err == wechat.ErrCodeEq400 {
+				fmt.Println("uuid失效请重新获取")
+				return
+			}
+			fmt.Println(err)
+			return
+		}
+		fmt.Println("登录成功回调地址:" + string(redirect_uri))
+		break
+	}
 }

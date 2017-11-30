@@ -20,7 +20,7 @@ func getNewHttpx() *httpx.Httpx {
 	hx.SetRedirect(0)
 	//设置协议头
 	var h http.Header
-	h = make(http.Header,5)
+	h = make(http.Header, 5)
 	h.Set("User-Agent", UserAgent[function.RandInt(len(UserAgent))])
 	h.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
 	h.Set("Accept-Language", "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3")
