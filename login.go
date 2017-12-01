@@ -2,6 +2,7 @@ package wechat
 
 import (
 	"wechat/function"
+	"fmt"
 )
 
 //获取web微信uuid
@@ -104,4 +105,14 @@ func (w *Wechat) ConfirmQrcode(uuid []byte) ([]byte, error) {
 	}
 	//未知错误
 	return resp.Body, ErrUnknown
+}
+
+//获取登录信息
+func (w *Wechat) GetLoginInfo(redirect_uri []byte) (error) {
+	resp, err := w.httpx.Get(string(redirect_uri)+"&fun=new&version=v2&lang=zh_CN")
+	if err != nil && resp.Status != 200 {
+		return err
+	}
+	fmt.Println(string(resp.Body))
+	return nil
 }

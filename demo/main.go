@@ -48,9 +48,10 @@ func main() {
 		fmt.Println("base64微信头像:" + string(head_img))
 		break
 	}
+	var redirect_uri []byte
 	//监听确认登录
 	for {
-		redirect_uri, err := we.ConfirmQrcode(uuid)
+		redirect_uri, err = we.ConfirmQrcode(uuid)
 		if err != nil {
 			if err == wechat.ErrCodeEq408 {
 				fmt.Println("扫码超时重新监听")
@@ -66,4 +67,5 @@ func main() {
 		fmt.Println("登录成功回调地址:" + string(redirect_uri))
 		break
 	}
+	we.GetLoginInfo(redirect_uri)
 }
