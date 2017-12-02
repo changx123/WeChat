@@ -2,7 +2,7 @@ package wechat
 
 import (
 	"wechat/function"
-	"fmt"
+	"encoding/xml"
 )
 
 //获取web微信uuid
@@ -107,12 +107,51 @@ func (w *Wechat) ConfirmQrcode(uuid []byte) ([]byte, error) {
 	return resp.Body, ErrUnknown
 }
 
+//微信登录信息
+type LoginInfo struct {
+	//微信skey 每次随机
+	Skey string
+	//微信sid 每次随机
+	Wxsid string
+	//微信uin 每个微信号固定值，用来确定身份
+	Wxuin string
+	//我想pass_ticket 每次随机
+	PassTicket string
+}
+
 //获取登录信息
-func (w *Wechat) GetLoginInfo(redirect_uri []byte) (error) {
-	resp, err := w.httpx.Get(string(redirect_uri)+"&fun=new&version=v2&lang=zh_CN")
+func (w *Wechat) GetLoginInfo(redirect_uri []byte) (*LoginInfo, error) {
+	resp, err := w.httpx.Get(string(redirect_uri) + "&fun=new&version=v2&lang=zh_CN")
 	if err != nil && resp.Status != 200 {
-		return err
+		return nil, err
 	}
-	fmt.Println(string(resp.Body))
-	return nil
+	//<error><ret>0</ret><message></message><skey>@cry**a8</skey><wxsid>G+92ZsVYiWRNeiPx</wxsid><wxuin>1**9</wxuin><pass_ticket>**</pass_ticket><isgrayscale>1</isgrayscale></error>
+	//解析xml结构
+	type XmlData struct {
+		Message     string `xml:"message"`
+		Ret         string `xml:"ret"`
+		Skey        string `xml:"skey"`
+		Wxsid       string `xml:"wxsid"`
+		Wxuin       string `xml:"wxuin"`
+		PassTicket  string `xml:"pass_ticket"`
+		Isgrayscale string `xml:"isgrayscale"`
+	}
+	var Uxml XmlData
+	//解析xml
+	err = xml.Unmarshal(resp.Body, &Uxml)
+	if err != nil {
+		return nil, err
+	}
+	//获取成功
+	if Uxml.Ret == "0" {
+		var loginInfo LoginInfo
+		loginInfo.Skey = Uxml.Skey
+		loginInfo.Wxsid = Uxml.Wxsid
+		loginInfo.Wxuin = Uxml.Wxuin
+		loginInfo.PassTicket = Uxml.PassTicket
+		w.logininfo = &loginInfo
+		return w.logininfo, nil
+	}
+	//未知错误
+	return nil, ErrUnknown
 }

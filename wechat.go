@@ -9,6 +9,8 @@ import (
 type Wechat struct {
 	//httpx指针
 	httpx *httpx.Httpx
+	//登录信息
+	logininfo *LoginInfo
 }
 
 //获取新的httpx指针对象

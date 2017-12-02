@@ -67,5 +67,16 @@ func main() {
 		fmt.Println("登录成功回调地址:" + string(redirect_uri))
 		break
 	}
-	we.GetLoginInfo(redirect_uri)
+	loginInfo , err := we.GetLoginInfo(redirect_uri)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("登录信息:",loginInfo)
+	userInfo , err := we.GetUserInfo()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("用户信息:",userInfo)
 }
