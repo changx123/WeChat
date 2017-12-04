@@ -4,7 +4,6 @@ import (
 	"github.com/changx123/httpx"
 	"net/http"
 	"wechat/function"
-	"time"
 )
 
 type Wechat struct {
