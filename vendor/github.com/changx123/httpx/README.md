@@ -21,8 +21,6 @@ hx = httpx.NewHttpx()
 
 ##设置302重定向次数
 ```go
-//go官方库中当http请求到302代码 就会默认执行跳转操作
-//而且不会记录cookie header等信息
 //0是不执行302重定向 >0 执行多少次
 [object].SetRedirect(0)
 ```
@@ -40,6 +38,15 @@ if caCrt, err := ioutil.ReadFile("./xxxx.crt"); err == nil {
     [object].SetCertPoolx509(caCrt)
 }
 ```
+
+##使用cookieJar自动操作保存cookie信息
+```go
+    [object].SetAutoSaveCookie(true)
+```
+
+
+
+
 
 
 

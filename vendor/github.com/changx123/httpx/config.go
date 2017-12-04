@@ -7,6 +7,8 @@ import (
 	"strconv"
 	"crypto/x509"
 	"crypto/tls"
+	"net"
+	"time"
 )
 
 //获取Tr配置指针
@@ -69,12 +71,24 @@ func (httpx *Httpx) SetInsecureSkipVerify(b bool) {
 }
 
 //设置x509cert证书
-func (httpx *Httpx) SetCertPoolx509(b []byte) bool {
+func (httpx *Httpx) SetCertPoolx509(b []byte) error {
 	pool := x509.NewCertPool()
 	ok := pool.AppendCertsFromPEM(b)
 	if !ok {
-		return ok
+		return errors.New("ok eq false")
 	}
 	httpx.getConfigTls().RootCAs = pool
-	return ok
+	return nil
+}
+
+//设置DialTLS函数
+func (httpx *Httpx) SetDialTLSTimeOutFun(f func(netw, addr string) (net.Conn, error))  {
+	httpx.getconfigTr().DialTLS = f
+}
+
+//设置超时
+//[connTimeOut 建立连接超时时间],[deadLine 发送接收数据超时时间]
+func (httpx *Httpx) SetTimeout(connTimeOut time.Duration,deadLine time.Duration) {
+	httpx.getconfigTr().TLSHandshakeTimeout = connTimeOut
+	httpx.getconfigTr().ResponseHeaderTimeout = deadLine
 }

@@ -11,6 +11,7 @@ func Post(url string, contentType string, b []byte) (*Response, error) {
 	if err != nil {
 		return &Response{}, err
 	}
+	defer resp.Body.Close()
 	var response Response
 	err = response.response(resp)
 	return &response, err

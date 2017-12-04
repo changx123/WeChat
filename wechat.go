@@ -4,6 +4,7 @@ import (
 	"github.com/changx123/httpx"
 	"net/http"
 	"wechat/function"
+	"time"
 )
 
 type Wechat struct {
@@ -29,6 +30,8 @@ func getNewHttpx() *httpx.Httpx {
 	h.Set("Connection", "keep-alive")
 	h.Set("Upgrade-Insecure-Requests", "1")
 	hx.SetHeader(&h)
+	//连接超时10秒，请求和返回数据超时60秒
+	//hx.SetTimeout(time.Second*10, time.Second*60)
 	return hx
 }
 
