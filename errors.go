@@ -11,4 +11,6 @@ var(
 	ErrCodeEq400 = errors.New("wechat: Return data code eq 400")
 	//未知错误
 	ErrUnknown = errors.New("wechat: unknown error")
+	//未知错误
+	ErrVersion = errors.New("wechat: version error")
 )

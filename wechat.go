@@ -11,6 +11,8 @@ type Wechat struct {
 	httpx *httpx.Httpx
 	//登录信息
 	logininfo *LoginInfo
+	//apiUrl根据微信接口版本而定
+	apiUrl string
 }
 
 //获取新的httpx指针对象
@@ -42,5 +44,4 @@ func (w *Wechat) SetProxy(url string) {
 //初始化web微信cookie 等数据
 func (w *Wechat) Init() {
 	w.httpx = getNewHttpx()
-	w.httpx.Get("https://wx2.qq.com/?&lang=zh_CN")
 }

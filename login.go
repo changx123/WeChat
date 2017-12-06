@@ -121,6 +121,16 @@ type LoginInfo struct {
 
 //获取登录信息
 func (w *Wechat) GetLoginInfo(redirect_uri []byte) (*LoginInfo, error) {
+	version := string(redirect_uri[8:11])
+	switch version {
+	case "wx2":
+		w.apiUrl = string(redirect_uri[0:19])
+	case "wx.":
+		w.apiUrl = string(redirect_uri[0:18])
+	default:
+		return nil, ErrVersion
+	}
+	w.httpx.Get(w.apiUrl)
 	resp, err := w.httpx.Get(string(redirect_uri) + "&fun=new&version=v2&lang=zh_CN")
 	if err != nil && resp.Status != 200 {
 		return nil, err
@@ -154,4 +164,13 @@ func (w *Wechat) GetLoginInfo(redirect_uri []byte) (*LoginInfo, error) {
 	}
 	//未知错误
 	return nil, ErrUnknown
+}
+
+//退出
+func (w *Wechat) Logout() error {
+	resp, err := w.httpx.Post(w.apiUrl+"cgi-bin/mmwebwx-bin/webwxlogout?redirect=1&type=0&skey="+w.logininfo.Skey, []byte("sid="+w.logininfo.Wxsid+"&uin="+w.logininfo.Wxuin))
+	if err != nil || resp.Status != 200 {
+		return err
+	}
+	return nil
 }

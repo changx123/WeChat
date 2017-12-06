@@ -96,7 +96,7 @@ func (w *Wechat) GetUserInfo() (*UserInfoJson, error) {
 	de := function.RandInt(999999999999999)
 	//组合post参数
 	d := []byte(`{"BaseRequest": {"Uin": "` + w.logininfo.Wxuin + `","Sid": "` + w.logininfo.Wxsid + `","Skey": "` + w.logininfo.Skey + `","DeviceID": "e` + strconv.Itoa(de) + `"}}`)
-	resp, err := w.httpx.Post("https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxinit?r="+xTime+"&pass_ticket="+w.logininfo.PassTicket, d)
+	resp, err := w.httpx.Post(w.apiUrl+"cgi-bin/mmwebwx-bin/webwxinit?r="+xTime+"&pass_ticket="+w.logininfo.PassTicket, d)
 	if err != nil && resp.Status != 200 {
 		return nil, err
 	}
@@ -165,7 +165,7 @@ func (w *Wechat) GetUserFriend() (*UserFriendListJson, error) {
 	//r 截取3-13
 	xTime := "-" + function.RegexpString(sTime, 3, 13)
 	//请求数据
-	resp, err := w.httpx.Get("https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxgetcontact?lang=zh_CN&pass_ticket=" + w.logininfo.PassTicket + "&r=" + xTime + "&seq=0&skey=" + w.logininfo.Skey)
+	resp, err := w.httpx.Get(w.apiUrl + "cgi-bin/mmwebwx-bin/webwxgetcontact?lang=zh_CN&pass_ticket=" + w.logininfo.PassTicket + "&r=" + xTime + "&seq=0&skey=" + w.logininfo.Skey)
 	if err != nil && resp.Status != 200 {
 		return nil, err
 	}
