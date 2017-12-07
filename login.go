@@ -30,7 +30,7 @@ func (w *Wechat) GetUUid() ([]byte, error) {
 
 //获取二维码
 //return [img二维码],[error]
-func (w *Wechat) GetQrcide(uuid []byte) ([]byte, error) {
+func (w *Wechat) GetQrcode(uuid []byte) ([]byte, error) {
 	resp, err := w.httpx.Get("https://login.weixin.qq.com/qrcode/" + string(uuid))
 	if err != nil && resp.Status != 200 {
 		return nil, err

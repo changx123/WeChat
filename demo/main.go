@@ -18,7 +18,7 @@ func main() {
 		return
 	}
 	//获取登录二维码
-	img, err := we.GetQrcide(uuid)
+	img, err := we.GetQrcode(uuid)
 	if err != nil {
 		fmt.Println(err)
 		return
