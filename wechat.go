@@ -4,6 +4,7 @@ import (
 	"github.com/changx123/httpx"
 	"net/http"
 	"wechat/function"
+	"encoding/base64"
 )
 
 type Wechat struct {
@@ -44,4 +45,12 @@ func (w *Wechat) SetProxy(url string) {
 //初始化web微信cookie 等数据
 func (w *Wechat) Init() {
 	w.httpx = getNewHttpx()
+}
+
+//base64加密
+func Base64Encoding(b []byte) []byte {
+	coder := base64.NewEncoding("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/")
+	buf := make([]byte, coder.EncodedLen(len(b)))
+	coder.Encode(buf, b)
+	return buf
 }
