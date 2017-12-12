@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>WGO-HOME</title>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+	<link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+	<!-- 可选的 Bootstrap 主题文件（一般不用引入） -->
+	<!-- <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous"> -->
+
+	<!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+	<!-- <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script> -->
+	<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+	<script type="text/javascript" src="https://cdn.bootcss.com/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+
+	<script src="/js/quietflow.min.js"></script>
+</head>
+<body>
+	<style type="text/css">
+		body {
+			padding: 0px;
+			margin: 0px;
+			width: 100%;
+			height: 1080px;
+			background-color: #0006;
+		}
+		.wechat_login{
+			width: 415px;
+			height: 490px;
+			background-color: #0006;
+			position: absolute;
+			right: 10%;
+			top: 20%;
+		}
+		.wechat_login .title{
+			width: 415px;
+			height: 70px;
+			background-color: #00000080;
+			text-align: center;
+			color: #c2ae87;
+			font-size: 32px;
+			line-height: 75px;
+		}
+		.wechat_login .wechat_erweima{
+			position: relative;
+			width: 415px;
+			height: 360px;
+		}
+		.wechat_login .wechat_erweima .wechat_load{
+			color: #e6b02e;
+			font-size: 35px;
+			display: block;
+			text-align: center;
+			font-family: 华文黑体;
+			height: 360px;
+			line-height: 360px;
+		}
+		.wechat_login .wechat_erweima .wechat_img{
+			width: 300px;
+			height: 270px;
+			margin: 45px auto;
+			display: none;
+		}
+
+		.wechat_login .wechat_erweima .wechat_img img{
+			width: 300px;
+			height: 300;
+		}
+
+		.wechat_login .wechat_erweima .prompt{
+			text-align: center;
+			color: #fce9c399;
+			font-size: 32px;
+		}
+
+		.wechat_login .wechat_erweima .shuaxin{
+			border:0px;
+			width: 96px;
+			height: 96px;
+			background: url(https://res.wx.qq.com/a/wx_fed/webwx/res/static/css/5af37c4a880a95586cd41c5b251d5562@1x.png) no-repeat;
+			background-position: 0 -150px;
+			position: absolute;
+    		top: 97px;
+			left: 163px;
+    		display: none;
+		}
+	</style>
+	<div class="wechat_login">
+		<div class="title">LOGIN</div>
+		<div class="wechat_erweima">
+			<div class="wechat_load">load</div>
+			<div class="wechat_img"><img src=""></div>
+			<div class="shuaxin"></div>
+			<div class="prompt">正在获取登录二维码</div>
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+	function websocketOnAll(websocket){
+		var head = false
+		$(".wechat_img img").attr("src","")
+    	websocket.onopen = function(evt) { 
+	           	websocket.send("1")
+	        }; 
+        websocket.onclose = function(evt) {
+        	$(".wechat_img").css("opacity","0.4")
+			$(".shuaxin").show()
+			$(".prompt").text("登录超时请重新获取二维码")
+        }; 
+        websocket.onmessage = function(evt) { 
+            var redata = evt.data
+            if (head) {
+            	alert("微信唯一uin为:"+redata)
+            	return
+            }
+            if ($(".wechat_img img").attr("src") == "") {
+            	$(".shuaxin").hide()
+				$(".wechat_img").css("opacity","1")
+				$(".wechat_load").hide()
+	    		$(".wechat_img").show()
+	    		$(".wechat_img img").attr("src","data:image/png;base64,"+redata)
+	    		$(".prompt").text("请用手机微信扫描登录")
+	    		return
+            }else{
+            	head = true
+            	$(".wechat_img img").attr("src",redata)
+            	return
+            }
+        }; 
+        websocket.onerror = function(evt) { 
+            onError("错误") 
+        }; 
+    }
+</script>
+<script type="text/javascript">
+	$("body").quietflow({theme : "simpleGradient",primary : "#63E2FF",accent : "#B066FE"})
+	$(function () {
+        var wechat_load = setInterval("loginLoad()",500)
+        var websocket = null
+		if(window.WebSocket){
+	        websocket = new WebSocket("ws://localhost:8005/wechat/login/socket.io")
+	        websocketOnAll(websocket)
+	    }else{
+	        alert('This browser does not supports WebSocket');
+	    }
+	    $(".shuaxin").click(function(event) {
+	    	websocket = new WebSocket("ws://localhost:8005/wechat/login/socket.io")
+	    	websocketOnAll(websocket)
+	    	$(".wechat_img").hide()
+			$(".wechat_load").show()
+			$(".prompt").text("正在获取登录二维码")
+	    	$(this).hide()
+	    });
+    })
+</script>
+<script type="text/javascript">
+	function loginLoad(){
+		var load = $(".wechat_load")
+		if (load.text() == "load......") {
+			load.text("load.")
+		}else{
+			load.text(load.text() + ".")
+		}
+	}
+	loginLoad()
+</script>
+</html>
